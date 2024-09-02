@@ -3,15 +3,26 @@ import React, { useState } from 'react';
 const ToggleSwitch = ({ onConfirm }) => {
     const [isActive, setIsActive] = useState(false);
 
-    const handleDrag = (event) => {
-        if (!isActive && event.clientX > 100) { // Assuming 100 is the threshold for activation
-            setIsActive(true);
-            onConfirm();
-        }
-    };
-
     const handleMouseDown = (event) => {
         event.preventDefault(); // Prevent default behavior to ensure dragging only
+        const initialX = event.clientX;
+
+        const handleMouseMove = (moveEvent) => {
+            if (!isActive && moveEvent.clientX - initialX > 100) { // Assuming 100 is the threshold for activation
+                setIsActive(true);
+                onConfirm();
+                document.removeEventListener('mousemove', handleMouseMove);
+            }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mouseup', handleMouseUp);
     };
 
     return (
@@ -24,7 +35,6 @@ const ToggleSwitch = ({ onConfirm }) => {
                 position: 'relative',
                 cursor: 'pointer',
             }}
-            onMouseMove={handleDrag}
             onMouseDown={handleMouseDown}
         >
             <div
