@@ -28,7 +28,7 @@ const ToggleSwitch = ({ onConfirm }) => {
     return (
         <div
             style={{
-                width: '200px',
+                width: '300px', // Adjusted width for a longer switch
                 height: '50px',
                 backgroundColor: isActive ? 'green' : 'grey',
                 borderRadius: '25px',
@@ -44,7 +44,7 @@ const ToggleSwitch = ({ onConfirm }) => {
                     backgroundColor: 'white',
                     borderRadius: '50%',
                     position: 'absolute',
-                    left: isActive ? '150px' : '0px',
+                    left: isActive ? '250px' : '0px', // Adjusted position for a longer switch
                     transition: 'left 0.3s',
                 }}
             />
