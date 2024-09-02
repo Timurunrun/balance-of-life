@@ -10,6 +10,10 @@ const ToggleSwitch = ({ onConfirm }) => {
         }
     };
 
+    const handleMouseDown = (event) => {
+        event.preventDefault(); // Prevent default behavior to ensure dragging only
+    };
+
     return (
         <div
             style={{
@@ -21,6 +25,7 @@ const ToggleSwitch = ({ onConfirm }) => {
                 cursor: 'pointer',
             }}
             onMouseMove={handleDrag}
+            onMouseDown={handleMouseDown}
         >
             <div
                 style={{
