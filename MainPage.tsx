@@ -32,9 +32,10 @@ const ToggleSwitch = ({ onConfirm }) => {
                 backgroundColor: isActive ? 'green' : 'grey',
                 borderRadius: '25px',
                 position: 'relative',
-                cursor: 'pointer',
+                cursor: 'grab',
             }}
             onTouchStart={handleTouchStart}
+            onMouseDown={(e) => e.preventDefault()} // Prevent mouse click activation
         >
             <div
                 style={{
