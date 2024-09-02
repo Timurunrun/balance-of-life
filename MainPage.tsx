@@ -3,26 +3,25 @@ import React, { useState } from 'react';
 const ToggleSwitch = ({ onConfirm }) => {
     const [isActive, setIsActive] = useState(false);
 
-    const handleMouseDown = (event) => {
-        event.preventDefault(); // Prevent default behavior to ensure dragging only
-        const initialX = event.clientX;
+    const handleTouchStart = (event) => {
+        const initialX = event.touches[0].clientX;
 
-        const handleMouseMove = (moveEvent) => {
-            if (!isActive && moveEvent.clientX - initialX > 100) { // Assuming 100 is the threshold for activation
+        const handleTouchMove = (moveEvent) => {
+            if (!isActive && moveEvent.touches[0].clientX - initialX > 100) { // Assuming 100 is the threshold for activation
                 setIsActive(true);
                 onConfirm();
-                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('touchmove', handleTouchMove);
             }
         };
 
-        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('touchmove', handleTouchMove);
 
-        const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+        const handleTouchEnd = () => {
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
         };
 
-        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('touchend', handleTouchEnd);
     };
 
     return (
@@ -35,7 +34,7 @@ const ToggleSwitch = ({ onConfirm }) => {
                 position: 'relative',
                 cursor: 'pointer',
             }}
-            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
         >
             <div
                 style={{
