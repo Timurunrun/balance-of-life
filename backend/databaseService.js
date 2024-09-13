@@ -43,9 +43,7 @@ class DatabaseService {
   }
 
   async getGoals(userId) {
-    console.log(`Getting goals for user: ${userId}`);
     const goals = await this.db.all('SELECT * FROM Goals WHERE user_id = ? ORDER BY goal_order', userId);
-    console.log(`Retrieved ${goals.length} goals for user ${userId}`);
     return goals;
   }
 
@@ -128,21 +126,15 @@ class DatabaseService {
   }
   
   async ensureUserExists(userId, username) {
-    console.log(`Ensuring user exists: ${userId}, ${username}`);
     const user = await this.db.get('SELECT * FROM Users WHERE user_id = ?', userId);
     if (!user) {
-      console.log(`User ${userId} does not exist. Creating new user.`);
       await this.db.run('INSERT INTO Users (user_id, username) VALUES (?, ?)', [userId, username]);
       
-      // Add sample goals for the new user
       const sampleGoals = ['Семья', 'Деньги', 'Спорт', 'Здоровье', 'Развлечения'];
       for (let i = 0; i < sampleGoals.length; i++) {
-        console.log(`Adding sample goal: ${sampleGoals[i]}`);
         await this.addGoal(userId, sampleGoals[i]);
       }
-      console.log(`Sample goals added for user ${userId}`);
     } else {
-      console.log(`User ${userId} already exists.`);
     }
   }
 }

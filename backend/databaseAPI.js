@@ -3,9 +3,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3001';
 
 export const getGoals = async (userId) => {
-  console.log('getGoals', userId);
   const response = await axios.get(`${API_URL}/goals/${userId}`);
-  console.log('response', response.data);
   return response.data;
 };
 

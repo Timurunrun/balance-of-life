@@ -15,15 +15,16 @@ import {
   ListItem,
   Spinner,
 } from '@chakra-ui/react';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, Crown, User, Home, Target, BarChart3 } from 'lucide-react'
+import { Crown, User, Home, Target, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 //@ts-ignore
 import { getStatistics } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 interface AspectRating {
   aspect: string;
@@ -52,21 +53,6 @@ const findLowestRated = (data: AspectRating[]): AspectRating | null => {
   return data.reduce((min, item) => (item.rating < min.rating ? item : min));
 };
 
-const truncateText = (text: string): string => {
-  // const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
-  // if (text.length <= 6) return text;
-  
-  // let truncated = text.slice(0, 6);
-  // while (truncated.length > 1 && vowels.includes(truncated[truncated.length - 1].toLowerCase())) {
-  //   truncated = truncated.slice(0, -1);
-  // }
-  
-  //return truncated + '...';
-
-  return text;
-};
-
-// Tabbar component
 const Tabbar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <Flex
     as="nav"
@@ -85,7 +71,6 @@ const Tabbar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </Flex>
 );
 
-// Tabbar.Item component
 const TabbarItem: React.FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
   <Flex
     direction="column"
@@ -131,7 +116,6 @@ export const StatisticsPage: React.FC = () => {
         setUserId(authorizedUserId);
         fetchStatistics(authorizedUserId, period);
       } catch (error) {
-        console.error('Authorization failed:', error);
         setIsLoading(false);
       }
     };
@@ -158,7 +142,6 @@ export const StatisticsPage: React.FC = () => {
       const data = await getStatistics(userId, period);
       setUserData(data);
     } catch (error) {
-      console.error('Error fetching statistics:', error);
       setUserData(null);
     } finally {
       setIsLoading(false);
@@ -230,7 +213,7 @@ export const StatisticsPage: React.FC = () => {
             <AnimatePresence>
               {[
                 <motion.div
-                  key="radar-chart"
+                  key="pie-chart"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -241,18 +224,31 @@ export const StatisticsPage: React.FC = () => {
                       <Heading size="md" fontFamily={"Open Sans Regular"}>Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
-                      <Box h="200px">
+                      <Box h="400px"> {/* Increased height to accommodate legend */}
                         <ResponsiveContainer width="100%" height="100%">
-                          <RadarChart data={data}>
-                            <PolarGrid />
-                            <PolarAngleAxis 
-                              dataKey="aspect" 
-                              tick={{ fontSize: 10 }}
-                              tickFormatter={truncateText}
+                          <PieChart>
+                            <Pie
+                              data={data}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius="60%"
+                              outerRadius="80%"
+                              paddingAngle={5}
+                              dataKey="rating"
+                              nameKey="aspect"
+                            >
+                              {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend 
+                              layout="vertical" 
+                              align="center" 
+                              verticalAlign="bottom"
+                              wrapperStyle={{ fontSize: '12px' }}
                             />
-                            <PolarRadiusAxis angle={90} domain={[1, 2, 3, 4, 5]} tick={false}/>
-                            <Radar name="Баланс жизни" dataKey="rating" stroke="#2196f3" fill="#2196f3" fillOpacity={0.6} />
-                          </RadarChart>
+                          </PieChart>
                         </ResponsiveContainer>
                       </Box>
                     </CardBody>

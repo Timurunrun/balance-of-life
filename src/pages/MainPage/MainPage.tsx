@@ -3,10 +3,11 @@ import { Box, Flex, Heading, Slider, SliderMark, SliderTrack, SliderThumb, Text,
 import { Crown, User, Home, Target, BarChart3, ArrowRight, Check } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @ts-ignore
-import { saveGoalValues, getGoals } from '../../../backend/databaseAPI'; // Import the API functions
+import { saveGoalValues, getGoals } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
+// @ts-ignore
+import { createInvoiceLink } from '../../../backend/starsAPI';
 
-// Define types
 interface Goal {
   goal_id: number;
   goal_name: string;
@@ -33,7 +34,7 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
   const handleMove = (clientX: number) => {
     if (!isDragging || !toggleRef.current || isConfirmed) return;
     const toggleRect = toggleRef.current.getBoundingClientRect();
-    const maxPosition = toggleRect.width - 45; // 5px from the right edge
+    const maxPosition = toggleRect.width - 45;
     const newPosition = Math.max(0, Math.min(clientX - toggleRect.left, maxPosition));
     setPosition(newPosition);
   };
@@ -41,7 +42,7 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
   const handleEnd = () => {
     setIsDragging(false);
     if (!isConfirmed && position > (toggleRef.current?.offsetWidth || 0) * 0.8 - 45) {
-      setPosition((toggleRef.current?.offsetWidth || 0) - 45); // 5px from the right edge
+      setPosition((toggleRef.current?.offsetWidth || 0) - 45);
       setIsConfirmed(true);
       onConfirm();
     } else if (!isConfirmed) {
@@ -87,7 +88,7 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
         fontSize="16px"
         transition="opacity 0.3s"
         opacity={isConfirmed ? 0 : 1}
-        userSelect="none" // Makes text unselectable
+        userSelect="none"
       >
         Протяните
       </Text>
@@ -101,7 +102,7 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
         fontSize="16px"
         transition="opacity 0.3s"
         opacity={isConfirmed ? 1 : 0}
-        userSelect="none" // Makes text unselectable
+        userSelect="none"
       >
         Супер!
       </Text>
@@ -128,7 +129,6 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
   );
 };
 
-// Tabbar component
 const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
   <Flex
     as="nav"
@@ -147,7 +147,6 @@ const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
   </Flex>
 );
 
-// Tabbar.Item component
 const TabbarItem: FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
   <Flex
     direction="column"
@@ -188,31 +187,30 @@ export const MainPage: FC = () => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        console.log('Initializing authentication');
         const authorizedUserId = await authorizeUser();
-        console.log('Authorized user ID:', authorizedUserId);
         setUserId(authorizedUserId);
         fetchGoals(authorizedUserId);
       } catch (error) {
-        console.error('Authorization failed:', error);
         setIsLoading(false);
+        throw error;
       }
     };
   
     initAuth();
   }, []);
+
+  const handleBuyPremium = async () => {
+    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
+  }
   
   const fetchGoals = async (authorizedUserId: string) => {
     try {
-      console.log('Fetching goals for user:', authorizedUserId);
       const fetchedGoals: Goal[] = await getGoals(authorizedUserId);
-      console.log('Fetched goals:', fetchedGoals);
       setGoals(fetchedGoals);
       setSliderValues(fetchedGoals.reduce((acc: SliderValues, goal) => ({...acc, [goal.goal_id]: 1}), {}));
       setIsLoading(false);
-      setGoalsLoaded(true); // Set goalsLoaded to true after fetching
+      setGoalsLoaded(true);
     } catch (error) {
-      console.error('Error fetching goals:', error);
       setIsLoading(false);
     }
   };
@@ -223,7 +221,6 @@ export const MainPage: FC = () => {
 
   const handleConfirm = async () => {
     if (!userId) {
-      console.error('User not authorized');
       return;
     }
 
@@ -240,7 +237,7 @@ export const MainPage: FC = () => {
         fetchGoals(userId);
       }, delay);
     } catch (error) {
-      console.error('Error saving goal values:', error);
+      throw error;
     }
   };
   
@@ -267,7 +264,9 @@ export const MainPage: FC = () => {
         borderBottomColor="var(--tg-theme-section-separator-color)" 
         zIndex={10}
       >
-        <Crown size={24} color="#ffd700" />
+        <Box onClick={handleBuyPremium} cursor="pointer">
+          <Crown size={24} color="#ffd700" />
+        </Box>
         <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
         <User size={24} color="var(--tg-theme-hint-color)" />
       </Flex>

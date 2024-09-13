@@ -4,7 +4,6 @@ import {
   AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogBody, 
   AlertDialogCloseButton, Button, useToast 
 } from '@chakra-ui/react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Crown, User, PencilLine, Home, Target, BarChart3, Plus, Trash2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @ts-ignore
@@ -35,13 +34,10 @@ export const GoalsPage: FC = () => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        console.log('Initializing authentication');
         const authorizedUserId = await authorizeUser();
-        console.log('Authorized user ID:', authorizedUserId);
         setUserId(authorizedUserId);
         fetchGoals(authorizedUserId);
       } catch (error) {
-        console.error('Authorization failed:', error);
         setIsLoading(false);
         toast({
           title: "Авторизация не удалась",
@@ -58,15 +54,12 @@ export const GoalsPage: FC = () => {
 
   const fetchGoals = async (authorizedUserId: string) => {
     try {
-      console.log('Fetching goals for user:', authorizedUserId);
       const fetchedGoals: Goal[] = await getGoals(authorizedUserId);
-      console.log('Fetched goals:', fetchedGoals);
       setGoals(fetchedGoals);
       setGoalOrder(fetchedGoals.map(goal => goal.goal_id).sort((a, b) => a - b));
       setIsLoading(false);
-      setGoalsLoaded(true); // Set goalsLoaded to true after fetching
+      setGoalsLoaded(true);
     } catch (error) {
-      console.error('Error fetching goals:', error);
       setIsLoading(false);
       toast({
         title: "Проблема",
@@ -77,6 +70,7 @@ export const GoalsPage: FC = () => {
       });
     }
   };
+
   const handleEditGoal = (goal: Goal) => {
     setEditingGoal(goal);
     setNewGoalName(goal.goal_name);
@@ -92,7 +86,6 @@ export const GoalsPage: FC = () => {
         ));
         onClose();
       } catch (error) {
-        console.error('Error updating goal:', error);
         toast({
           title: "Проблема",
           description: "Нам не удалось обновить ваши цели. Пожалуйста, попробуйте ещё раз.",
@@ -114,7 +107,6 @@ export const GoalsPage: FC = () => {
         setGoalOrder(updatedOrder);
         await reorderGoals(userId, updatedOrder);
       } catch (error) {
-        console.error('Error deleting goal:', error);
         toast({
           title: "Проблема",
           description: "При удалении вашей цели произошла проблема.",
@@ -137,12 +129,9 @@ export const GoalsPage: FC = () => {
   const handleAddGoal = async () => {
     if (newGoalName.trim() && userId) {
       try {
-        console.log('Adding new goal:', newGoalName);
         const result = await addGoal(userId, newGoalName, goals.length + 1);
-        console.log('Result from addGoal:', result);
         
         if (!result.lastID) {
-          console.error('New goal does not have a valid lastID');
           throw new Error('Invalid lastID');
         }
   
@@ -155,20 +144,17 @@ export const GoalsPage: FC = () => {
   
         setGoals(prevGoals => {
           const updatedGoals = [...prevGoals, newGoal];
-          console.log('Updated goals state:', updatedGoals);
           return updatedGoals;
         });
         
         setGoalOrder(prevOrder => {
           const updatedOrder = [...prevOrder, newGoal.goal_id];
-          console.log('Updated goal order:', updatedOrder);
           return updatedOrder;
         });
         
         setNewGoalName('');
         onClose();
       } catch (error) {
-        console.error('Error adding goal:', error);
         toast({
           title: "Проблема",
           description: "При добавлении вашей цели произошла проблема.",
@@ -180,7 +166,6 @@ export const GoalsPage: FC = () => {
     }
   };
 
-  // Tabbar component
   const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
     <Flex
       as="nav"
@@ -197,7 +182,6 @@ export const GoalsPage: FC = () => {
     </Flex>
   );
 
-  // Tabbar.Item component
   const TabbarItem: FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
     <Flex
       direction="column"
@@ -363,7 +347,7 @@ export const GoalsPage: FC = () => {
                 colorScheme="blue"
                 mr={3}
                 onClick={editingGoal ? handleUpdateGoal : handleAddGoal}
-                isDisabled={newGoalName.length > 10 || !newGoalName.trim()} // Disable if goal exceeds 10 characters
+                isDisabled={newGoalName.length > 10 || !newGoalName.trim()}
               >
                 {editingGoal ? 'Обновить' : 'Добавить'}
               </Button>
