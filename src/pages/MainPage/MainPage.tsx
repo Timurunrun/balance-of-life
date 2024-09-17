@@ -19,8 +19,7 @@ interface SliderValues {
   [key: string]: number;
 }
 
-const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
-  const [isDragging, setIsDragging] = useState(false);
+const CustomToggle: FC<{ onConfirm: () => void; isAnimating: boolean }> = ({ onConfirm, isAnimating }) => {  const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(5);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const toggleRef = useRef<HTMLDivElement>(null);
@@ -51,11 +50,14 @@ const CustomToggle: FC<{ onConfirm: () => void }> = ({ onConfirm }) => {
   };
 
   useEffect(() => {
-    if (!isDragging && !isConfirmed && position > 0 && position < (toggleRef.current?.offsetWidth || 0) - 45) {
+    if (isAnimating) {
+      setPosition(5);
+      setIsConfirmed(false);
+    } else if (!isDragging && !isConfirmed && position > 0 && position < (toggleRef.current?.offsetWidth || 0) - 45) {
       const timer = setTimeout(() => setPosition(5), 300);
       return () => clearTimeout(timer);
     }
-  }, [isDragging, position, isConfirmed]);
+  }, [isDragging, position, isConfirmed, isAnimating]);
 
   return (
     <Box
@@ -180,6 +182,7 @@ export const MainPage: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [goalsLoaded, setGoalsLoaded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -200,6 +203,7 @@ export const MainPage: FC = () => {
   }, []);
 
   const handleBuyPremium = async () => {
+    if (!userId) return; // Add null check for userId
     await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
   }
   
@@ -223,7 +227,7 @@ export const MainPage: FC = () => {
     if (!userId) {
       return;
     }
-
+  
     try {
       const values = Object.entries(sliderValues).map(([goalId, value]) => ({
         goalId: parseInt(goalId),
@@ -231,11 +235,16 @@ export const MainPage: FC = () => {
       }));
       await saveGoalValues(userId, values);
       
-      const delay = 1000;
+      // Add a 1-second delay before starting the animation
       setTimeout(() => {
-        setIsLoading(true);
-        fetchGoals(userId);
-      }, delay);
+        setIsAnimating(true);
+        
+        // Add another setTimeout for resetting the values
+        setTimeout(() => {
+          setSliderValues(goals.reduce((acc: SliderValues, goal) => ({...acc, [goal.goal_id]: 1}), {}));
+          setIsAnimating(false);
+        }, 1000);
+      }, 1000);
     } catch (error) {
       throw error;
     }
@@ -280,8 +289,8 @@ export const MainPage: FC = () => {
         maxW="90%" 
         mt="80px"
         boxShadow="lg"
-        opacity={goalsLoaded ? 1 : 0}
-        maxHeight={goalsLoaded ? "2000px" : "0px"}
+        opacity={goalsLoaded && !isAnimating ? 1 : 0}
+        maxHeight={goalsLoaded && !isAnimating ? "2000px" : "0px"}
         transition="opacity 0.5s ease-in-out, max-height 0.5s ease-in-out"
         overflow="hidden"
       >
@@ -319,7 +328,7 @@ export const MainPage: FC = () => {
             ))}
           </Box>
           <Box w="full">
-            <CustomToggle onConfirm={handleConfirm} />
+            <CustomToggle onConfirm={handleConfirm} isAnimating={isAnimating} />
           </Box>
         </VStack>
       </Box>
