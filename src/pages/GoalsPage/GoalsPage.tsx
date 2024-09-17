@@ -10,6 +10,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { getGoals, updateGoal, deleteGoal, addGoal, reorderGoals } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createInvoiceLink } from '../../../backend/starsAPI';
 
 interface Goal {
   goal_id: number;
@@ -27,6 +28,7 @@ export const GoalsPage: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [goalsLoaded, setGoalsLoaded] = useState(false);
+  const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -51,6 +53,11 @@ export const GoalsPage: FC = () => {
 
     initAuth();
   }, []);
+
+  const handleBuyPremium = async () => {
+    if (!userId) return;
+    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
+  }
 
   const fetchGoals = async (authorizedUserId: string) => {
     try {
@@ -97,15 +104,22 @@ export const GoalsPage: FC = () => {
     }
   };
 
-  const handleDeleteGoal = async (goalId: number) => {
-    if (goals.length > 1 && userId) {
+  const confirmDeleteGoal = (goal: Goal) => {
+    setGoalToDelete(goal);
+    onOpen();
+  };
+  
+  const handleConfirmDeleteGoal = async () => {
+    if (goalToDelete && userId) {
       try {
-        await deleteGoal(goalId, userId);
-        const updatedGoals = goals.filter(goal => goal.goal_id !== goalId);
-        const updatedOrder = goalOrder.filter(id => id !== goalId);
+        await deleteGoal(goalToDelete.goal_id, userId);
+        const updatedGoals = goals.filter(goal => goal.goal_id !== goalToDelete.goal_id);
+        const updatedOrder = goalOrder.filter(id => id !== goalToDelete.goal_id);
         setGoals(updatedGoals);
         setGoalOrder(updatedOrder);
         await reorderGoals(userId, updatedOrder);
+        setGoalToDelete(null);
+        onClose();
       } catch (error) {
         toast({
           title: "Проблема",
@@ -115,14 +129,6 @@ export const GoalsPage: FC = () => {
           isClosable: true,
         });
       }
-    } else {
-      toast({
-        title: "Это последняя цель",
-        description: "В списке должна остаться хотя бы одна цель.",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
     }
   };
 
@@ -226,7 +232,9 @@ export const GoalsPage: FC = () => {
         borderBottomColor="var(--tg-theme-section-separator-color)" 
         zIndex={10}
       >
-        <Crown size={24} color="#ffd700" />
+        <Box onClick={handleBuyPremium} cursor="pointer">
+          <Crown size={24} color="#ffd700" />
+        </Box>
         <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
         <User size={24} color="var(--tg-theme-hint-color)" />
       </Flex>
@@ -284,7 +292,7 @@ export const GoalsPage: FC = () => {
                         icon={<Trash2 size={20} />}
                         variant="ghost"
                         color="var(--tg-theme-hint-color)"
-                        onClick={() => handleDeleteGoal(goal.goal_id)}
+                        onClick={() => confirmDeleteGoal(goal)}
                         isDisabled={goals.length <= 1}
                       />
                     </Box>
@@ -321,37 +329,61 @@ export const GoalsPage: FC = () => {
         />
       </Flex>
 
-      {/* Edit/Add Goal AlertDialog */}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
-        onClose={onClose}
+        onClose={() => {
+          setGoalToDelete(null);
+          onClose();
+        }}
       >
         <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              {editingGoal ? 'Изменить цель' : 'Добавить цель'}
+          <AlertDialogContent maxWidth="90%" bg="var(--tg-theme-bg-color)">
+            <AlertDialogHeader fontSize="lg" fontWeight="bold" color="var(--tg-theme-text-color)">
+              {goalToDelete ? 'Подтвердите удаление' : editingGoal ? 'Изменить цель' : 'Добавить цель'}
             </AlertDialogHeader>
             <AlertDialogCloseButton />
-            <AlertDialogBody>
-              <Input
-                value={newGoalName}
-                onChange={(e) => setNewGoalName(e.target.value)}
-                placeholder="Введите цель"
-                maxLength={10}
-              />
-              <Text mt={2} color="var(--tg-theme-subtitle-text-color)" fontSize="sm">{newGoalName.length}/10 букв</Text> {/* Display character count */}
+            <AlertDialogBody color="var(--tg-theme-text-color)">
+              {goalToDelete ? (
+                <Text>Вы уверены, что хотите удалить цель «{goalToDelete.goal_name}»? Это приведет к очистке всех связанных с ней данных.</Text>
+              ) : (
+                <>
+                  <Input
+                    value={newGoalName}
+                    onChange={(e) => setNewGoalName(e.target.value)}
+                    placeholder="Введите цель"
+                    maxLength={10}
+                  />
+                  <Text mt={2} color="var(--tg-theme-subtitle-text-color)" fontSize="sm">{newGoalName.length}/10 букв</Text>
+                </>
+              )}
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button
-                colorScheme="blue"
-                mr={3}
-                onClick={editingGoal ? handleUpdateGoal : handleAddGoal}
-                isDisabled={newGoalName.length > 10 || !newGoalName.trim()}
-              >
-                {editingGoal ? 'Обновить' : 'Добавить'}
-              </Button>
-              <Button variant="ghost" ref={cancelRef} onClick={onClose}>Закрыть</Button>
+              {goalToDelete ? (
+                <>
+                  <Button colorScheme="red" onClick={handleConfirmDeleteGoal}>
+                    Удалить
+                  </Button>
+                  <Button variant="ghost" color="var(--tg-theme-text-color)" _hover={{ }} ref={cancelRef} onClick={() => {
+                    setGoalToDelete(null);
+                    onClose();
+                  }}>
+                    Отмена
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    colorScheme="blue"
+                    mr={3}
+                    onClick={editingGoal ? handleUpdateGoal : handleAddGoal}
+                    isDisabled={newGoalName.length > 10 || !newGoalName.trim()}
+                  >
+                    {editingGoal ? 'Обновить' : 'Добавить'}
+                  </Button>
+                  <Button variant="ghost" color="var(--tg-theme-text-color)" _hover={{ }} ref={cancelRef} onClick={onClose}>Закрыть</Button>
+                </>
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>

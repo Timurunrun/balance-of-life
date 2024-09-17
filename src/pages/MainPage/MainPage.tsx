@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // @ts-ignore
 import { saveGoalValues, getGoals } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
-// @ts-ignore
 import { createInvoiceLink } from '../../../backend/starsAPI';
 
 interface Goal {
@@ -203,7 +202,7 @@ export const MainPage: FC = () => {
   }, []);
 
   const handleBuyPremium = async () => {
-    if (!userId) return; // Add null check for userId
+    if (!userId) return;
     await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
   }
   

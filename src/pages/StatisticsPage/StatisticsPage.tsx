@@ -23,6 +23,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 //@ts-ignore
 import { getStatistics } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
+import { createInvoiceLink } from '../../../backend/starsAPI';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -135,6 +136,11 @@ export const StatisticsPage: React.FC = () => {
     }
   }, [dataLoaded]);
 
+  const handleBuyPremium = async () => {
+    if (!userId) return;
+    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
+  }
+
   const fetchStatistics = async (userId: string, period: string) => {
     setIsLoading(true);
     setDataLoaded(false);
@@ -177,7 +183,9 @@ export const StatisticsPage: React.FC = () => {
         borderBottomColor="var(--tg-theme-section-separator-color)" 
         zIndex={10}
       >
-        <Crown size={24} color="#ffd700" />
+        <Box onClick={handleBuyPremium} cursor="pointer">
+          <Crown size={24} color="#ffd700" />
+        </Box>
         <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
         <User size={24} color="var(--tg-theme-hint-color)" />
       </Flex>
@@ -219,9 +227,9 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card borderRadius="xl">
+                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"}>Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
                       <Box h="400px"> {/* Increased height to accommodate legend */}
@@ -261,21 +269,21 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  <Card borderRadius="xl">
+                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"}>Сводка на {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Сводка на {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
                       <SimpleGrid columns={1} spacing={4}>
                         <Box>
-                          <Text fontWeight="medium">Средняя оценка</Text>
-                          <Text fontSize="2xl" fontWeight="bold">
+                          <Text fontWeight="medium" color="var(--tg-theme-text-color)">Средняя оценка</Text>
+                          <Text fontSize="2xl" fontWeight="bold" color="var(--tg-theme-text-color)">
                             {averageRating}
                           </Text>
                         </Box>
                         {highestRated && (
                           <Box>
-                            <Text fontWeight="medium">Лучшая цель</Text>
+                            <Text fontWeight="medium" color="var(--tg-theme-text-color)">Лучшая цель</Text>
                             <Badge variant="subtle" colorScheme="green" mt={1}>
                               {highestRated.aspect} ({highestRated.rating})
                             </Badge>
@@ -283,7 +291,7 @@ export const StatisticsPage: React.FC = () => {
                         )}
                         {lowestRated && (
                           <Box>
-                            <Text fontWeight="medium">Стоит поработать</Text>
+                            <Text fontWeight="medium" color="var(--tg-theme-text-color)">Стоит поработать</Text>
                             <Badge variant="subtle" colorScheme="red" mt={1}>
                               {lowestRated.aspect} ({lowestRated.rating})
                             </Badge>
@@ -300,16 +308,16 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: 0.2 }}
                 >
-                  <Card borderRadius="xl">
+                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"}>Подробные данные за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Подробные данные за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
                       <List spacing={2}>
                         {data.map((item) => (
                           <ListItem key={item.aspect}>
                             <Flex justify="space-between" align="center">
-                              <Text>{item.aspect}</Text>
+                              <Text color="var(--tg-theme-text-color)">{item.aspect}</Text>
                               <Badge variant="outline">{item.rating}/5</Badge>
                             </Flex>
                           </ListItem>
@@ -321,9 +329,9 @@ export const StatisticsPage: React.FC = () => {
               ]}
             </AnimatePresence>
           ) : (
-            <Card borderRadius="xl">
+            <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
               <CardBody>
-                <Text>Нет данных для отображения за выбранный период.</Text>
+                <Text color="var(--tg-theme-text-color)">Нет данных для отображения за выбранный период.</Text>
               </CardBody>
             </Card>
           )}
