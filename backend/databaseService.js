@@ -17,7 +17,8 @@ class DatabaseService {
       -- Create Users table
       CREATE TABLE IF NOT EXISTS Users (
           user_id INTEGER PRIMARY KEY,
-          username TEXT NOT NULL
+          username TEXT NOT NULL,
+          is_premium BOOLEAN NOT NULL DEFAULT FALSE
       );
       -- Create Goals table
       CREATE TABLE IF NOT EXISTS Goals (
@@ -123,6 +124,10 @@ class DatabaseService {
         throw new Error('Invalid period');
     }
     return now.toISOString().split('T')[0];
+  }
+  
+  async updatePremiumStatus(userId, isPremium) {
+    return this.db.run('UPDATE Users SET isPremium = ? WHERE user_id = ?', [isPremium ? 1 : 0, userId]);
   }
   
   async ensureUserExists(userId, username) {

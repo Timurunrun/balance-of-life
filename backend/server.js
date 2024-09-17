@@ -114,6 +114,16 @@ app.get('/goal-values/:userId', async (req, res) => {
   }
 });
 
+app.post('/update-premium-status', async (req, res) => {
+  try {
+    const { userId, isPremium } = req.body;
+    await dbService.updatePremiumStatus(userId, isPremium);
+    res.json({ message: 'Premium status updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/create-invoice', async (req, res) => {
   try {
 

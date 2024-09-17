@@ -10,7 +10,10 @@ export const createInvoiceLink = async (title: string, description: string, payl
     const response = await axios.post(`${API_URL}/create-invoice`, { title: title, description: description, payload: payload, prices: prices });
     try {
       if (response.data.ok) {
-        invoice.open(response.data.result, 'url');
+        const invoiceUrl = response.data.result;
+        invoice.open(invoiceUrl, 'url').then(async () => {
+          await axios.post(`${API_URL}/update-premium-status`, { userId: payload, isPremium: true });
+        });
       } else {
         throw new Error(response.data.error);
       }
