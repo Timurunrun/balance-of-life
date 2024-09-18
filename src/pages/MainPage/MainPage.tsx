@@ -1,11 +1,10 @@
-import React, { FC, useState, useRef, useEffect } from 'react';
-import { Box, Flex, Heading, Slider, SliderMark, SliderTrack, SliderThumb, Text, VStack, VisuallyHidden } from '@chakra-ui/react';
-import { Crown, User, Home, Target, BarChart3, ArrowRight, Check } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { FC, useState, useRef, useEffect } from 'react';
+import { Box, Slider, SliderMark, SliderTrack, SliderThumb, Text, VStack, VisuallyHidden } from '@chakra-ui/react';
+import { ArrowRight, Check } from 'lucide-react';
+import { Layout } from '../../components/Layout';
 // @ts-ignore
 import { saveGoalValues, getGoals } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
-import { createInvoiceLink } from '../../../backend/starsAPI';
 
 interface Goal {
   goal_id: number;
@@ -130,61 +129,12 @@ const CustomToggle: FC<{ onConfirm: () => void; isAnimating: boolean }> = ({ onC
   );
 };
 
-const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Flex
-    as="nav"
-    position="fixed"
-    bottom={0}
-    left={0}
-    right={0}
-    bg="var(--tg-theme-bg-color)"
-    justifyContent="space-around"
-    py={2}
-    borderTopWidth={1} 
-    borderTopColor="var(--tg-theme-section-separator-color)" 
-    zIndex={20}
-  >
-    {children}
-  </Flex>
-);
-
-const TabbarItem: FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
-  <Flex
-    direction="column"
-    align="center"
-    justify="center"
-    flex={1}
-    py={1}
-    color={selected ? "var(--tg-theme-link-color)" : "var(--tg-theme-hint-color)"}
-    onClick={onClick}
-    cursor="pointer"
-    height="100%"
-    zIndex={15}
-    role="button"
-    aria-label={text}
-    aria-selected={selected}
-    tabIndex={0}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        onClick();
-      }
-    }}
-  >
-    <Box mb={1}>{children}</Box>
-    <Text fontSize="xs" userSelect="none">{text}</Text>
-    </Flex>
-);
-
 export const MainPage: FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [sliderValues, setSliderValues] = useState<SliderValues>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [goalsLoaded, setGoalsLoaded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -193,28 +143,20 @@ export const MainPage: FC = () => {
         setUserId(authorizedUserId);
         fetchGoals(authorizedUserId);
       } catch (error) {
-        setIsLoading(false);
         throw error;
       }
     };
   
     initAuth();
   }, []);
-
-  const handleBuyPremium = async () => {
-    if (!userId) return;
-    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
-  }
   
   const fetchGoals = async (authorizedUserId: string) => {
     try {
       const fetchedGoals: Goal[] = await getGoals(authorizedUserId);
       setGoals(fetchedGoals);
       setSliderValues(fetchedGoals.reduce((acc: SliderValues, goal) => ({...acc, [goal.goal_id]: 1}), {}));
-      setIsLoading(false);
       setGoalsLoaded(true);
     } catch (error) {
-      setIsLoading(false);
     }
   };
 
@@ -234,11 +176,9 @@ export const MainPage: FC = () => {
       }));
       await saveGoalValues(userId, values);
       
-      // Add a 1-second delay before starting the animation
       setTimeout(() => {
         setIsAnimating(true);
         
-        // Add another setTimeout for resetting the values
         setTimeout(() => {
           setSliderValues(goals.reduce((acc: SliderValues, goal) => ({...acc, [goal.goal_id]: 1}), {}));
           setIsAnimating(false);
@@ -250,35 +190,7 @@ export const MainPage: FC = () => {
   };
   
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      minH="100vh"
-      pb={20}
-      bgGradient="linear(135deg, #38d4bf, #38d056)"
-    >
-      <Flex 
-        as="header" 
-        bg="var(--tg-theme-header-bg-color)" 
-        w="full" 
-        position="fixed" 
-        top={0} 
-        left={0} 
-        justify="space-between" 
-        align="center" 
-        p={4} 
-        borderBottomWidth={1} 
-        borderBottomColor="var(--tg-theme-section-separator-color)" 
-        zIndex={10}
-      >
-        <Box onClick={handleBuyPremium} cursor="pointer">
-          <Crown size={24} color="#ffd700" />
-        </Box>
-        <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
-        <User size={24} color="var(--tg-theme-hint-color)" />
-      </Flex>
-
+    <Layout userId={userId}>
       <Box 
         bg="var(--tg-theme-bg-color)" 
         borderRadius="xl" 
@@ -331,30 +243,6 @@ export const MainPage: FC = () => {
           </Box>
         </VStack>
       </Box>
-
-      <Tabbar>
-        <TabbarItem 
-          text="Сегодня" 
-          selected={location.pathname === '/'} 
-          onClick={() => navigate('/')}
-        >
-          <Home size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Цели" 
-          selected={location.pathname === '/goals'} 
-          onClick={() => navigate('/goals')}
-        >
-          <Target size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Статистика" 
-          selected={location.pathname === '/statistics'} 
-          onClick={() => navigate('/statistics')}
-        >
-          <BarChart3 size={24} />
-        </TabbarItem>
-      </Tabbar>
-    </Flex>
+    </Layout>
   );
 };

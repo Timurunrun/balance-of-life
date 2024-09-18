@@ -140,7 +140,7 @@ class DatabaseService {
     if (!user) {
       await this.db.run('INSERT INTO Users (user_id, username) VALUES (?, ?)', [userId, username]);
       
-      const sampleGoals = ['Семья', 'Деньги', 'Спорт', 'Здоровье', 'Развлечения'];
+      const sampleGoals = ['Семья', 'Деньги', 'Спорт', 'Здоровье', 'Веселье'];
       for (let i = 0; i < sampleGoals.length; i++) {
         await this.addGoal(userId, sampleGoals[i]);
       }

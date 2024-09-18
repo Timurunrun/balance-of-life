@@ -1,16 +1,15 @@
 import React, { FC, useState, useEffect } from 'react';
 import { 
-  Box, Heading, VStack, Text, Flex, IconButton, Input, useDisclosure, 
+  Box, VStack, Text, Flex, IconButton, Input, useDisclosure, 
   AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogBody, 
   AlertDialogCloseButton, Button, useToast 
 } from '@chakra-ui/react';
-import { Crown, User, PencilLine, Home, Target, BarChart3, Plus, Trash2 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Layout } from '../../components/Layout';
 // @ts-ignore
 import { getGoals, updateGoal, deleteGoal, addGoal, reorderGoals, getPremiumStatus } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createInvoiceLink } from '../../../backend/starsAPI';
 
 interface Goal {
   goal_id: number;
@@ -25,13 +24,11 @@ export const GoalsPage: FC = () => {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [newGoalName, setNewGoalName] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [goalsLoaded, setGoalsLoaded] = useState(false);
   const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null);
   const [isPremium, setIsPremium] = useState<boolean>(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+
   const toast = useToast();
 
   useEffect(() => {
@@ -43,7 +40,6 @@ export const GoalsPage: FC = () => {
         const premiumStatus = await getPremiumStatus(authorizedUserId);
         setIsPremium(premiumStatus);
       } catch (error) {
-        setIsLoading(false);
         toast({
           title: "Авторизация не удалась",
           description: "У нас не получилось вас узнать. Пожалуйста, попробуйте снова.",
@@ -57,20 +53,13 @@ export const GoalsPage: FC = () => {
     initAuth();
   }, []);
 
-  const handleBuyPremium = async () => {
-    if (!userId) return;
-    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
-  }
-
   const fetchGoals = async (authorizedUserId: string) => {
     try {
       const fetchedGoals: Goal[] = await getGoals(authorizedUserId);
       setGoals(fetchedGoals);
       setGoalOrder(fetchedGoals.map(goal => goal.goal_id).sort((a, b) => a - b));
-      setIsLoading(false);
       setGoalsLoaded(true);
     } catch (error) {
-      setIsLoading(false);
       toast({
         title: "Проблема",
         description: "Нам не удалось загрузить ваши цели. Пожалуйста, попробуйте ещё раз.",
@@ -190,74 +179,11 @@ export const GoalsPage: FC = () => {
       }
     }
   };
-
-  const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
-    <Flex
-      as="nav"
-      position="fixed"
-      bottom={0}
-      left={0}
-      right={0}
-      bg="var(--tg-theme-header-bg-color)" 
-      justifyContent="space-around"
-      py={2}
-      zIndex={20}
-    >
-      {children}
-    </Flex>
-  );
-
-  const TabbarItem: FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      flex={1}
-      py={1}
-      color={selected ? "var(--tg-theme-link-color)" : "var(--tg-theme-hint-color)"}
-      onClick={onClick}
-      cursor="pointer"
-      height="100%"
-    >
-      <Box mb={1}>{children}</Box>
-      <Text fontSize="xs" userSelect="none">{text}</Text>
-    </Flex>
-  );
   
   const cancelRef = React.useRef<HTMLButtonElement>(null);
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      minH="100vh"
-      pb={8}
-      bgGradient="linear(135deg, #38d4bf, #38d056)"
-    >
-      
-      {/* Header */}
-      <Flex 
-        as="header" 
-        bg="var(--tg-theme-header-bg-color)" 
-        w="full" 
-        position="fixed" 
-        top={0} 
-        left={0} 
-        justify="space-between" 
-        align="center" 
-        p={4} 
-        borderBottomWidth={1} 
-        borderBottomColor="var(--tg-theme-section-separator-color)" 
-        zIndex={10}
-      >
-        <Box onClick={handleBuyPremium} cursor="pointer">
-          <Crown size={24} color="#ffd700" />
-        </Box>
-        <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
-        <User size={24} color="var(--tg-theme-hint-color)" />
-      </Flex>
-  
+    <Layout userId={userId}>
       <Box 
         bg="var(--tg-theme-bg-color)" 
         borderRadius="xl" 
@@ -272,10 +198,9 @@ export const GoalsPage: FC = () => {
         transition="opacity 0.5s ease-in-out, max-height 0.5s ease-in-out"
         overflow="hidden"
       >
-
         {/* Main Content */}
         <VStack as="main" w="full" spacing={4} paddingX={7} pb="40px" flex={1} overflowY="auto">
-        <Box height="10px" />
+          <Box height="10px" />
           <AnimatePresence>
             {goalOrder.map((goalId, index) => {
               const goal = goals.find(g => g.goal_id === goalId);
@@ -323,7 +248,7 @@ export const GoalsPage: FC = () => {
         </VStack>
       </Box>
 
-      {/* Add Button - Moved outside the Box and positioned at the bottom */}
+      {/* Add Button */}
       <Flex 
         position="fixed" 
         bottom="80px" 
@@ -344,6 +269,7 @@ export const GoalsPage: FC = () => {
         />
       </Flex>
 
+      {/* AlertDialog */}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
@@ -403,30 +329,6 @@ export const GoalsPage: FC = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-
-      <Tabbar>
-        <TabbarItem 
-          text="Сегодня" 
-          selected={location.pathname === '/'} 
-          onClick={() => navigate('/')}
-        >
-          <Home size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Цели" 
-          selected={location.pathname === '/goals'} 
-          onClick={() => navigate('/goals')}
-        >
-          <Target size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Статистика" 
-          selected={location.pathname === '/statistics'} 
-          onClick={() => navigate('/statistics')}
-        >
-          <BarChart3 size={24} />
-        </TabbarItem>
-      </Tabbar>
-    </Flex>
+    </Layout>
   );
 };

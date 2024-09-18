@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Flex,
-  Heading,
   VStack,
   Select,
   Card,
@@ -14,16 +12,16 @@ import {
   List,
   ListItem,
   Spinner,
+  Flex,
+  Heading,
 } from '@chakra-ui/react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Crown, User, Home, Target, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Layout } from '../../components/Layout';
 
 //@ts-ignore
 import { getStatistics } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
-import { createInvoiceLink } from '../../../backend/starsAPI';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -54,51 +52,6 @@ const findLowestRated = (data: AspectRating[]): AspectRating | null => {
   return data.reduce((min, item) => (item.rating < min.rating ? item : min));
 };
 
-const Tabbar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Flex
-    as="nav"
-    position="fixed"
-    bottom={0}
-    left={0}
-    right={0}
-    bg="var(--tg-theme-bg-color)"
-    justifyContent="space-around"
-    py={2}
-    borderTopWidth={1} 
-    borderTopColor="var(--tg-theme-section-separator-color)" 
-    zIndex={20}
-  >
-    {children}
-  </Flex>
-);
-
-const TabbarItem: React.FC<{ children: React.ReactNode; text: string; selected?: boolean; onClick: () => void }> = ({ children, text, selected = false, onClick }) => (
-  <Flex
-    direction="column"
-    align="center"
-    justify="center"
-    flex={1}
-    py={1}
-    color={selected ? "var(--tg-theme-link-color)" : "var(--tg-theme-hint-color)"}
-    onClick={onClick}
-    cursor="pointer"
-    height="100%"
-    zIndex={15}
-    role="button"
-    aria-label={text}
-    aria-selected={selected}
-    tabIndex={0}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        onClick();
-      }
-    }}
-  >
-    <Box mb={1}>{children}</Box>
-    <Text fontSize="xs" userSelect="none">{text}</Text>
-  </Flex>
-);
-
 export const StatisticsPage: React.FC = () => {
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -106,9 +59,6 @@ export const StatisticsPage: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [contentLoaded, setContentLoaded] = useState(false);
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -136,11 +86,6 @@ export const StatisticsPage: React.FC = () => {
     }
   }, [dataLoaded]);
 
-  const handleBuyPremium = async () => {
-    if (!userId) return;
-    await createInvoiceLink('Полный доступ', 'Возможность создавать до 15 целей', userId, [{label: 'Full access', amount: 1}]);
-  }
-
   const fetchStatistics = async (userId: string, period: string) => {
     setIsLoading(true);
     setDataLoaded(false);
@@ -161,38 +106,10 @@ export const StatisticsPage: React.FC = () => {
   const lowestRated = findLowestRated(data);
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      minH="100vh"
-      bgGradient="linear(135deg, #38d4bf, #38d056)"
-    >
-      {/* Header */}
-      <Flex 
-        as="header" 
-        bg="var(--tg-theme-header-bg-color)" 
-        w="full" 
-        position="fixed" 
-        top={0} 
-        left={0} 
-        justify="space-between" 
-        align="center" 
-        p={4} 
-        borderBottomWidth={1} 
-        borderBottomColor="var(--tg-theme-section-separator-color)" 
-        zIndex={10}
-      >
-        <Box onClick={handleBuyPremium} cursor="pointer">
-          <Crown size={24} color="#ffd700" />
-        </Box>
-        <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
-        <User size={24} color="var(--tg-theme-hint-color)" />
-      </Flex>
-  
+    <Layout userId={userId}>
       <Box 
         w="full" 
-        maxW="100%" 
+        maxW="90%" 
         mt="80px"
         mb="80px"
         borderRadius="xl"
@@ -245,7 +162,7 @@ export const StatisticsPage: React.FC = () => {
                               dataKey="rating"
                               nameKey="aspect"
                             >
-                              {data.map((entry, index) => (
+                              {data.map((_, index) => (
                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                               ))}
                             </Pie>
@@ -337,30 +254,6 @@ export const StatisticsPage: React.FC = () => {
           )}
         </VStack>
       </Box>
-  
-      <Tabbar>
-        <TabbarItem 
-          text="Сегодня" 
-          selected={location.pathname === '/'} 
-          onClick={() => navigate('/')}
-        >
-          <Home size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Цели" 
-          selected={location.pathname === '/goals'} 
-          onClick={() => navigate('/goals')}
-        >
-          <Target size={24} />
-        </TabbarItem>
-        <TabbarItem 
-          text="Статистика" 
-          selected={location.pathname === '/statistics'} 
-          onClick={() => navigate('/statistics')}
-        >
-          <BarChart3 size={24} />
-        </TabbarItem>
-      </Tabbar>
-    </Flex>
+    </Layout>
   );
 };
