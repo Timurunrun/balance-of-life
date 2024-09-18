@@ -7,7 +7,7 @@ import {
 import { Crown, User, PencilLine, Home, Target, BarChart3, Plus, Trash2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @ts-ignore
-import { getGoals, updateGoal, deleteGoal, addGoal, reorderGoals } from '../../../backend/databaseAPI';
+import { getGoals, updateGoal, deleteGoal, addGoal, reorderGoals, getPremiumStatus } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createInvoiceLink } from '../../../backend/starsAPI';
@@ -29,6 +29,7 @@ export const GoalsPage: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [goalsLoaded, setGoalsLoaded] = useState(false);
   const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -39,6 +40,8 @@ export const GoalsPage: FC = () => {
         const authorizedUserId = await authorizeUser();
         setUserId(authorizedUserId);
         fetchGoals(authorizedUserId);
+        const premiumStatus = await getPremiumStatus(authorizedUserId);
+        setIsPremium(premiumStatus);
       } catch (error) {
         setIsLoading(false);
         toast({
@@ -129,6 +132,22 @@ export const GoalsPage: FC = () => {
           isClosable: true,
         });
       }
+    }
+  };
+
+  const handleAddButtonClick = () => {
+    if (goals.length >= 5 && !isPremium) {
+      toast({
+        title: "Потребуется полная версия",
+        description: "Для добавления более 5 целей необходимо приобрести полную версию.",
+        status: "info",
+        duration: 2000,
+        isClosable: false,
+      });
+    } else {
+      setEditingGoal(null);
+      setNewGoalName('');
+      onOpen();
     }
   };
 
@@ -318,11 +337,7 @@ export const GoalsPage: FC = () => {
           icon={<Plus size={24} />}
           colorScheme="green"
           borderRadius="full"
-          onClick={() => {
-            setEditingGoal(null);
-            setNewGoalName('');
-            onOpen();
-          }}
+          onClick={handleAddButtonClick}
           size="lg"
           isDisabled={goals.length >= 15}
           boxShadow="lg"

@@ -114,6 +114,15 @@ app.get('/goal-values/:userId', async (req, res) => {
   }
 });
 
+app.get('/premium-status/:userId', async (req, res) => {
+  try {
+    const isPremium = await dbService.getPremiumStatus(req.params.userId);
+    res.json({ isPremium });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/update-premium-status', async (req, res) => {
   try {
     const { userId, isPremium } = req.body;

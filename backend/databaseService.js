@@ -125,9 +125,14 @@ class DatabaseService {
     }
     return now.toISOString().split('T')[0];
   }
+
+  async getPremiumStatus(userId) {
+    const user = await this.db.get('SELECT is_premium FROM Users WHERE user_id = ?', userId);
+    return user ? user.is_premium === 1 : false;
+  }
   
   async updatePremiumStatus(userId, isPremium) {
-    return this.db.run('UPDATE Users SET isPremium = ? WHERE user_id = ?', [isPremium ? 1 : 0, userId]);
+    return this.db.run('UPDATE Users SET is_premium = ? WHERE user_id = ?', [isPremium ? 1 : 0, userId]);
   }
   
   async ensureUserExists(userId, username) {

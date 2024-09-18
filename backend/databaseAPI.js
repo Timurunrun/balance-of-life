@@ -41,3 +41,8 @@ export const getStatistics = async (userId, period) => {
   const response = await axios.get(`${API_URL}/statistics/${userId}/${period}`);
   return response.data;
 };
+
+export const getPremiumStatus = async (userId) => {
+  const response = await axios.get(`${API_URL}/premium-status/${userId}`);
+  return response.data.isPremium;
+};
