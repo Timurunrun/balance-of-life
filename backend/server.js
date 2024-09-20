@@ -114,6 +114,25 @@ app.get('/goal-values/:userId', async (req, res) => {
   }
 });
 
+app.get('/reminder/:userId', async (req, res) => {
+  try {
+    const reminder = await dbService.getReminder(req.params.userId);
+    res.json(reminder);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/reminder', async (req, res) => {
+  try {
+    const { userId, frequency, time } = req.body;
+    await dbService.setReminder(userId, frequency, time);
+    res.status(201).json({ message: 'Reminder set successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/premium-status/:userId', async (req, res) => {
   try {
     const isPremium = await dbService.getPremiumStatus(req.params.userId);
@@ -155,6 +174,25 @@ app.post('/create-invoice', async (req, res) => {
     } catch (error) {
         throw error;
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/reminder/:userId', async (req, res) => {
+  try {
+    const reminder = await dbService.getReminder(req.params.userId);
+    res.json(reminder);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/reminder', async (req, res) => {
+  try {
+    const { userId, frequency, time } = req.body;
+    await dbService.setReminder(userId, frequency, time);
+    res.status(201).json({ message: 'Reminder set successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

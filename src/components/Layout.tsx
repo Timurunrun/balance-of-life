@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Box, Flex, Heading, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from '@chakra-ui/react';
-import { Crown, User, Home, Target, BarChart3 } from 'lucide-react';
+import { Crown, Bell, Home, Target, BarChart3 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { createInvoiceLink } from '../../backend/starsAPI';
 
@@ -71,6 +71,10 @@ export const Layout: FC<LayoutProps> = ({ children, userId }) => {
     onClose();
   }
 
+  const handleOpenReminders = () => {
+    navigate('/reminders');
+  }
+
   return (
     <Flex
       direction="column"
@@ -98,7 +102,9 @@ export const Layout: FC<LayoutProps> = ({ children, userId }) => {
           <Crown size={24} color="#ffd700" />
         </Box>
         <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
-        <User size={24} color="var(--tg-theme-hint-color)" />
+        <Box onClick={handleOpenReminders} cursor="pointer">
+          <Bell size={24} color="var(--tg-theme-hint-color)" />
+        </Box>
       </Flex>
 
       {children}

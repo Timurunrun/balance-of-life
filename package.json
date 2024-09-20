@@ -42,6 +42,7 @@
     "express": "^4.19.2",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.439.0",
+    "node-schedule": "^2.1.1",
     "pg": "^8.12.0",
     "postcss": "^8.4.41",
     "react": "^18.2.0",

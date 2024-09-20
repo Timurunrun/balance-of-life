@@ -46,3 +46,13 @@ export const getPremiumStatus = async (userId) => {
   const response = await axios.get(`${API_URL}/premium-status/${userId}`);
   return response.data.isPremium;
 };
+
+export const getReminder = async (userId) => {
+  const response = await axios.get(`${API_URL}/reminder/${userId}`);
+  return response.data;
+};
+
+export const setReminder = async (userId, frequency, time) => {
+  const response = await axios.post(`${API_URL}/reminder`, { userId, frequency, time });
+  return response.data;
+};

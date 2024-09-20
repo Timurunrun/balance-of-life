@@ -38,6 +38,13 @@ class DatabaseService {
           FOREIGN KEY (user_id) REFERENCES Users(user_id),
           FOREIGN KEY (goal_id) REFERENCES Goals(goal_id)
       );
+      -- Create Reminders table
+      CREATE TABLE IF NOT EXISTS Reminders (
+          user_id INTEGER PRIMARY KEY,
+          frequency INTEGER NOT NULL,
+          time TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES Users(user_id)
+      );
     `;
 
     await this.db.exec(schema);
@@ -146,6 +153,15 @@ class DatabaseService {
       }
     } else {
     }
+  }
+
+  async getReminder(userId) {
+    const reminder = await this.db.get('SELECT FROM Reminders WHERE user_id = ?', userId);
+    return reminder;
+  }
+  
+  async setReminder(userId, frequency, time) {
+    await this.db.run('INSERT OR REPLACE INTO Reminders (user_id, frequency, time) VALUES (?, ?, ?)', [userId, frequency, time]);
   }
 }
 

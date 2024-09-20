@@ -16,14 +16,13 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Layout } from '../../components/Layout';
 
 //@ts-ignore
 import { getStatistics } from '../../../backend/databaseAPI';
 import { authorizeUser } from '../../../backend/telegramAuth';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+const COLORS = ['#84a88e', '#e6c9a1', '#82afb4ff', '#e6715bff', '#dcae59', '#3b6d6e', '#6f6471', '#cadacc', '#82afb4', '#f39c85', '#e6715b', '#e8c374', '#3a978c', '#fbf2c4', '#c7522a'];
 
 interface AspectRating {
   aspect: string;
@@ -50,6 +49,52 @@ const findHighestRated = (data: AspectRating[]): AspectRating | null => {
 const findLowestRated = (data: AspectRating[]): AspectRating | null => {
   if (!data || data.length === 0) return null;
   return data.reduce((min, item) => (item.rating < min.rating ? item : min));
+};
+
+const CircularProgressChart = ({ value, max, label, color }: { value: number; max: number; label: string; color: string }) => {
+  const percentage = (value / max) * 100;
+  const strokeWidth = 10;
+  const radius = 50 - strokeWidth / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  const lighterColor = `${color}70`;
+
+  return (
+    <Box display="flex" flexDirection="column" alignItems="center">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id={`gradient-${label}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={lighterColor} />
+            <stop offset="100%" stopColor={color} />
+          </linearGradient>
+        </defs>
+        <circle
+          strokeWidth={strokeWidth}
+          stroke="#E5E5E5"
+          fill="transparent"
+          r={radius}
+          cx="50"
+          cy="50"
+        />
+        <circle
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          stroke={`url(#gradient-${label})`}
+          fill="transparent"
+          r={radius}
+          cx="50"
+          cy="50"
+        />
+        <text x="50" y="50" fontSize="20" textAnchor="middle" dy="7" fill={color}>
+          {value}
+        </text>
+      </svg>
+      <Text fontSize="sm" mt={1} color="var(--tg-theme-text-color)">{label}</Text>
+    </Box>
+  );
 };
 
 export const StatisticsPage: React.FC = () => {
@@ -138,7 +183,7 @@ export const StatisticsPage: React.FC = () => {
             <AnimatePresence>
               {[
                 <motion.div
-                  key="pie-chart"
+                  key="circular-charts"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -146,36 +191,22 @@ export const StatisticsPage: React.FC = () => {
                 >
                   <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">
+                        Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}
+                      </Heading>
                     </CardHeader>
                     <CardBody>
-                      <Box h="400px"> {/* Increased height to accommodate legend */}
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={data}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius="60%"
-                              outerRadius="80%"
-                              paddingAngle={5}
-                              dataKey="rating"
-                              nameKey="aspect"
-                            >
-                              {data.map((_, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend 
-                              layout="vertical" 
-                              align="center" 
-                              verticalAlign="bottom"
-                              wrapperStyle={{ fontSize: '12px' }}
-                            />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </Box>
+                      <SimpleGrid columns={[2, 3, 4]} spacing={4}>
+                        {data.map((item, index) => (
+                          <CircularProgressChart
+                            key={item.aspect}
+                            value={item.rating}
+                            max={5}
+                            label={item.aspect}
+                            color={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </SimpleGrid>
                     </CardBody>
                   </Card>
                 </motion.div>,
@@ -235,7 +266,7 @@ export const StatisticsPage: React.FC = () => {
                           <ListItem key={item.aspect}>
                             <Flex justify="space-between" align="center">
                               <Text color="var(--tg-theme-text-color)">{item.aspect}</Text>
-                              <Badge variant="outline">{item.rating}/5</Badge>
+                              <Badge variant="outline" colorScheme='green'>{item.rating}/5</Badge>
                             </Flex>
                           </ListItem>
                         ))}
