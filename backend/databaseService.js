@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
+const moment = require('moment-timezone');
 
 class DatabaseService {
   constructor() {
@@ -43,6 +44,8 @@ class DatabaseService {
           user_id INTEGER PRIMARY KEY,
           frequency INTEGER NOT NULL,
           time TEXT NOT NULL,
+          timezone TEXT NOT NULL,
+          last_notified TEXT,
           FOREIGN KEY (user_id) REFERENCES Users(user_id)
       );
     `;
@@ -155,14 +158,26 @@ class DatabaseService {
     }
   }
 
+  async getAllReminders() {
+    return this.db.all('SELECT * FROM Reminders');
+  }
+
   async getReminder(userId) {
-    const reminder = await this.db.get('SELECT FROM Reminders WHERE user_id = ?', userId);
+    const reminder = await this.db.get('SELECT * FROM Reminders WHERE user_id = ?', userId);
     return reminder;
+  }  
+
+  async setReminder(userId, frequency, time, timezone) {
+    await this.db.run(
+      'INSERT OR REPLACE INTO Reminders (user_id, frequency, time, timezone, last_notified) VALUES (?, ?, ?, ?, COALESCE((SELECT last_notified FROM Reminders WHERE user_id = ?), null))',
+      [userId, frequency, time, timezone, userId]
+    );
   }
-  
-  async setReminder(userId, frequency, time) {
-    await this.db.run('INSERT OR REPLACE INTO Reminders (user_id, frequency, time) VALUES (?, ?, ?)', [userId, frequency, time]);
-  }
+
+  async updateLastNotified(userId) {
+    const nowUTC = moment.utc().format();
+    await this.db.run('UPDATE Reminders SET last_notified = ? WHERE user_id = ?', [nowUTC, userId]);
+  }  
 }
 
 module.exports = new DatabaseService();

@@ -4,6 +4,11 @@ const dbService = require('./DatabaseService');
 const { validate, parse } = require('@telegram-apps/init-data-node');
 require('dotenv').config();
 const axios = require('axios');
+const cron = require('node-cron');
+const TelegramBot = require('node-telegram-bot-api');
+const botToken = process.env.BOT_TOKEN;
+const bot = new TelegramBot(botToken);
+const moment = require('moment-timezone');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -114,25 +119,6 @@ app.get('/goal-values/:userId', async (req, res) => {
   }
 });
 
-app.get('/reminder/:userId', async (req, res) => {
-  try {
-    const reminder = await dbService.getReminder(req.params.userId);
-    res.json(reminder);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/reminder', async (req, res) => {
-  try {
-    const { userId, frequency, time } = req.body;
-    await dbService.setReminder(userId, frequency, time);
-    res.status(201).json({ message: 'Reminder set successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 app.get('/premium-status/:userId', async (req, res) => {
   try {
     const isPremium = await dbService.getPremiumStatus(req.params.userId);
@@ -190,13 +176,46 @@ app.get('/reminder/:userId', async (req, res) => {
 
 app.post('/reminder', async (req, res) => {
   try {
-    const { userId, frequency, time } = req.body;
-    await dbService.setReminder(userId, frequency, time);
+    const { userId, frequency, time, timezone } = req.body;
+    await dbService.setReminder(userId, frequency, time, timezone);
     res.status(201).json({ message: 'Reminder set successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+cron.schedule('* * * * *', async () => {
+  try {
+    const reminders = await dbService.getAllReminders();
+    const nowUTC = moment.utc();
+
+    for (const reminder of reminders) {
+      const userTime = moment.tz(nowUTC, reminder.timezone);
+      const [hours, minutes] = reminder.time.split(':').map(Number);
+      const reminderTime = userTime.clone().hours(hours).minutes(minutes).seconds(0).milliseconds(0);
+
+      const lastNotifiedDate = reminder.last_notified ? moment.utc(reminder.last_notified) : null;
+      const diffDays = lastNotifiedDate
+        ? userTime.startOf('day').diff(moment.tz(lastNotifiedDate, reminder.timezone).startOf('day'), 'days')
+        : null;
+
+      if (
+        userTime.isSameOrAfter(reminderTime) &&
+        (diffDays === null || diffDays >= reminder.frequency)
+      ) {
+        await bot.sendMessage(
+          reminder.user_id,
+          'Это ваше запланированное напоминание!'
+        );
+
+        await dbService.updateLastNotified(reminder.user_id);
+      }
+    }
+  } catch (error) {
+    console.error('Error in scheduled task:', error);
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

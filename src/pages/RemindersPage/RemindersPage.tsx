@@ -1,3 +1,5 @@
+// RemindersPage.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -23,15 +25,19 @@ import { Layout } from '../../components/Layout';
 import { authorizeUser } from '../../../backend/telegramAuth';
 //@ts-ignore
 import { setReminder, getReminder } from '../../../backend/databaseAPI';
-
+import Select from 'react-select';
+import { timezones, TimezoneOption } from '../../utils/timezones';
 export const RemindersPage: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [frequency, setFrequency] = useState(1);
   const [time, setTime] = useState('12:00');
   const [isLoading, setIsLoading] = useState(true);
-  const [currentReminder, setCurrentReminder] = useState<{ frequency: number; time: string } | null>(null);
+  const [currentReminder, setCurrentReminder] = useState<{ frequency: number; time: string; timezone: string } | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [timezone, setTimezone] = useState<TimezoneOption>(
+    timezones.find(tz => tz.value === Intl.DateTimeFormat().resolvedOptions().timeZone) || timezones[0]
+  );
   const toast = useToast();
 
   useEffect(() => {
@@ -63,6 +69,8 @@ export const RemindersPage: React.FC = () => {
       if (reminder) {
         setFrequency(reminder.frequency);
         setTime(reminder.time);
+        const matchedTimezone = timezones.find(tz => tz.value === reminder.timezone);
+        setTimezone(matchedTimezone || timezones[0]);
       }
     } catch (error) {
       console.error('Error fetching reminder:', error);
@@ -75,10 +83,10 @@ export const RemindersPage: React.FC = () => {
     if (!userId) return;
 
     try {
-      await setReminder(userId, frequency, time);
+      await setReminder(userId, frequency, time, timezone.value);
       toast({
         title: 'Напоминание установлено',
-        description: `Вы будете получать уведомления каждые ${frequency} ${frequency === 1 ? 'день' : 'дня'} в ${time}`,
+        description: `Вы будете получать уведомления каждые ${frequency} ${frequency === 1 ? 'день' : 'дня'} в ${time} (${timezone.label})`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -140,6 +148,47 @@ export const RemindersPage: React.FC = () => {
                           ? `каждые ${currentReminder.frequency} ${currentReminder.frequency === 1 ? 'день' : 'дня'} в ${currentReminder.time}`
                           : 'не установлено'}
                       </Text>
+                    </Box>
+                    <Box>
+                      <Text mb={2} color="var(--tg-theme-text-color)" fontWeight="bold">Часовой пояс</Text>
+                      <Select
+                        options={timezones}
+                        value={timezone}
+                        onChange={(selectedOption) => setTimezone(selectedOption as TimezoneOption)}
+                        placeholder="Выберите часовой пояс"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            backgroundColor: 'var(--tg-theme-secondary-bg-color)',
+                            borderColor: 'var(--tg-theme-button-color)',
+                            color: 'var(--tg-theme-text-color)',
+                          }),
+                          singleValue: (provided) => ({
+                            ...provided,
+                            color: 'var(--tg-theme-text-color)',
+                          }),
+                          menu: (provided) => ({
+                            ...provided,
+                            backgroundColor: 'var(--tg-theme-secondary-bg-color)',
+                          }),
+                          option: (provided, state) => ({
+                            ...provided,
+                            backgroundColor: state.isSelected
+                              ? 'var(--tg-theme-button-color)'
+                              : state.isFocused
+                              ? 'var(--tg-theme-button-hover-color)'
+                              : 'var(--tg-theme-secondary-bg-color)',
+                            color: 'var(--tg-theme-text-color)',
+                          }),
+                          menuList: (provided) => ({
+                            ...provided,
+                            maxHeight: '200px', // Set maximum height
+                            overflowY: 'auto',  // Enable vertical scrolling
+                          }),
+                        }}
+                        menuPlacement="auto" // Automatically decide menu placement
+                        isSearchable
+                      />
                     </Box>
                     <Box>
                       <Text mb={2} color="var(--tg-theme-text-color)" fontWeight="bold">Частота (в днях)</Text>

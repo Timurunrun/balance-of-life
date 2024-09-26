@@ -52,7 +52,7 @@ export const getReminder = async (userId) => {
   return response.data;
 };
 
-export const setReminder = async (userId, frequency, time) => {
-  const response = await axios.post(`${API_URL}/reminder`, { userId, frequency, time });
+export const setReminder = async (userId, frequency, time, timezone) => {
+  const response = await axios.post(`${API_URL}/reminder`, { userId, frequency, time, timezone });
   return response.data;
 };
