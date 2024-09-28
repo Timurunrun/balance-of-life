@@ -73,7 +73,7 @@ const getMotivationalMessages = () => {
   return motivationalMessages[index];
 };
 
-app.post('/auth', async (req, res) => {
+app.post('/api/auth', async (req, res) => {
   try {
     const { initData } = req.body;
     if (!initData) {
@@ -109,7 +109,7 @@ app.post('/auth', async (req, res) => {
   }
 });
 
-app.get('/goals/:userId', async (req, res) => {
+app.get('/api/goals/:userId', async (req, res) => {
   try {
     const goals = await dbService.getGoals(req.params.userId);
     res.json(goals);
@@ -118,7 +118,7 @@ app.get('/goals/:userId', async (req, res) => {
   }
 });
 
-app.get('/statistics/:userId/:period', async (req, res) => {
+app.get('/api/statistics/:userId/:period', async (req, res) => {
   try {
     const { userId, period } = req.params;
     const statistics = await dbService.getStatistics(userId, period);
@@ -128,7 +128,7 @@ app.get('/statistics/:userId/:period', async (req, res) => {
   }
 });
 
-app.post('/goals', async (req, res) => {
+app.post('/api/goals', async (req, res) => {
   try {
     const { userId, goalName } = req.body;
     const result = await dbService.addGoal(userId, goalName);
@@ -138,7 +138,7 @@ app.post('/goals', async (req, res) => {
   }
 });
 
-app.put('/goals/:goalId', async (req, res) => {
+app.put('/api/goals/:goalId', async (req, res) => {
   try {
     const { goalName } = req.body;
     const result = await dbService.updateGoal(req.params.goalId, goalName);
@@ -148,7 +148,7 @@ app.put('/goals/:goalId', async (req, res) => {
   }
 });
 
-app.delete('/goals/:goalId', async (req, res) => {
+app.delete('/api/goals/:goalId', async (req, res) => {
   try {
     const result = await dbService.deleteGoal(req.params.goalId);
     res.json(result);
@@ -157,7 +157,7 @@ app.delete('/goals/:goalId', async (req, res) => {
   }
 });
 
-app.post('/goal-values', async (req, res) => {
+app.post('/api/goal-values', async (req, res) => {
   try {
     const { userId, values } = req.body;
     await dbService.saveGoalValues(userId, values);
@@ -167,7 +167,7 @@ app.post('/goal-values', async (req, res) => {
   }
 });
 
-app.get('/goal-values/:userId', async (req, res) => {
+app.get('/api/goal-values/:userId', async (req, res) => {
   try {
     const values = await dbService.getLatestGoalValues(req.params.userId);
     res.json(values);
@@ -176,7 +176,7 @@ app.get('/goal-values/:userId', async (req, res) => {
   }
 });
 
-app.get('/premium-status/:userId', async (req, res) => {
+app.get('/api/premium-status/:userId', async (req, res) => {
   try {
     const isPremium = await dbService.getPremiumStatus(req.params.userId);
     res.json({ isPremium });
@@ -185,7 +185,7 @@ app.get('/premium-status/:userId', async (req, res) => {
   }
 });
 
-app.post('/update-premium-status', async (req, res) => {
+app.post('/api/update-premium-status', async (req, res) => {
   try {
     const { userId, isPremium } = req.body;
     await dbService.updatePremiumStatus(userId, isPremium);
@@ -195,7 +195,7 @@ app.post('/update-premium-status', async (req, res) => {
   }
 });
 
-app.post('/create-invoice', async (req, res) => {
+app.post('/api/create-invoice', async (req, res) => {
   try {
 
     const { title, description, payload, prices } = req.body;
@@ -222,7 +222,7 @@ app.post('/create-invoice', async (req, res) => {
   }
 });
 
-app.get('/reminder/:userId', async (req, res) => {
+app.get('/api/reminder/:userId', async (req, res) => {
   try {
     const reminder = await dbService.getReminder(req.params.userId);
     res.json(reminder);
@@ -231,7 +231,7 @@ app.get('/reminder/:userId', async (req, res) => {
   }
 });
 
-app.post('/reminder', async (req, res) => {
+app.post('/api/reminder', async (req, res) => {
   try {
     const { userId, frequency, time, timezone } = req.body;
     await dbService.setReminder(userId, frequency, time, timezone);
@@ -273,7 +273,6 @@ cron.schedule('* * * * *', async () => {
     console.error('Error in scheduled task:', error);
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
