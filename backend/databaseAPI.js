@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = `http://localhost:${process.env.PORT}` || 'http://localhost:5000';
 
 export const getGoals = async (userId) => {
   const response = await axios.get(`${API_URL}/api/goals/${userId}`);

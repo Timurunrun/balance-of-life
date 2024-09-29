@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const dbService = require('./DatabaseService');
+const dbService = require('./databaseService');
 const { validate, parse } = require('@telegram-apps/init-data-node');
 require('dotenv').config();
 const axios = require('axios');
@@ -11,7 +11,7 @@ const bot = new TelegramBot(botToken);
 const moment = require('moment-timezone');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || '5000';
 
 app.use(cors());
 app.use(express.json());

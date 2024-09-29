@@ -1,7 +1,7 @@
 import { retrieveLaunchParams } from '@telegram-apps/sdk';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = `http://localhost:${process.env.PORT}` || 'http://localhost:5000';
 
 export const authorizeUser = async () => {
   try {

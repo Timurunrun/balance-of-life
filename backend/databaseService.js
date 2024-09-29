@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const moment = require('moment-timezone');
 
-class DatabaseService {
+class databaseService {
   constructor() {
     this.db = null;
     this.initDatabase();
@@ -180,4 +180,4 @@ class DatabaseService {
   }  
 }
 
-module.exports = new DatabaseService();
+module.exports = new databaseService();
