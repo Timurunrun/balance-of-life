@@ -1,10 +1,10 @@
 {
-  "name": "reactjs-template",
+  "name": "balance-of-life",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
-  "homepage": "https://telegram-mini-apps.github.io",
-  "proxy": "http://localhost:3000/",
+  "homepage": "/",
+  "proxy": "http://localhost:5000",
   "scripts": {
     "deploy": "gh-pages -d dist",
     "dev": "vite",
