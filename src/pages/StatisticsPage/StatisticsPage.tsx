@@ -165,10 +165,10 @@ export const StatisticsPage: React.FC = () => {
       >
         <VStack spacing={6} align="stretch" px={4} pb="40px" fontFamily={"Open Sans Regular"}>
           <Box bg="#FFFFFF" borderRadius="xl" p={4} boxShadow="md">
-            <Text as="h2" size="md" mb={2} fontFamily={"Open Sans Regular"}>
+            <Text as="h2" size="md" mb={2} color="#000000" fontFamily={"Open Sans Regular"}>
               Выберите временной промежуток
             </Text>
-            <Select value={period} onChange={(e) => setPeriod(e.target.value as 'week' | 'month' | 'year')}>
+            <Select value={period} color="#000000" onChange={(e) => setPeriod(e.target.value as 'week' | 'month' | 'year')}>
               <option value="week">Эта неделя</option>
               <option value="month">Этот месяц</option>
               <option value="year">Этот год</option>

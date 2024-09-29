@@ -216,7 +216,7 @@ export const GoalsPage: FC = () => {
                   style={{ width: '100%' }}
                 >
                   <Flex 
-                    borderColor='var(--tg-theme-section-separator-color)' 
+                    borderColor='var(--tg-theme-hint-color)' 
                     className="w-full justify-between items-center border-b pb-2"
                   >
                     <Text key={`text-${goal.goal_id}`} fontSize="lg" fontFamily={"Open Sans Regular"} color="#000000">{index + 1}. {goal.goal_name}</Text>

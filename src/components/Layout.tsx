@@ -16,11 +16,11 @@ const Tabbar: FC<{ children: React.ReactNode }> = ({ children }) => (
     bottom={0}
     left={0}
     right={0}
-    bg="var(--tg-theme-bg-color)"
+    bg="#FFFFFF"
     justifyContent="space-around"
     py={2}
     borderTopWidth={1} 
-    borderTopColor="var(--tg-theme-section-separator-color)" 
+    borderTopColor="var(--tg-theme-hint-color)" 
     zIndex={20}
   >
     {children}
@@ -86,7 +86,7 @@ export const Layout: FC<LayoutProps> = ({ children, userId }) => {
     >
       <Flex 
         as="header" 
-        bg="var(--tg-theme-header-bg-color)" 
+        bg="#FFFFFF" 
         w="full" 
         position="fixed" 
         top={0} 
@@ -95,13 +95,13 @@ export const Layout: FC<LayoutProps> = ({ children, userId }) => {
         align="center" 
         p={4} 
         borderBottomWidth={1} 
-        borderBottomColor="var(--tg-theme-section-separator-color)" 
+        borderBottomColor="var(--tg-theme-hint-color)" 
         zIndex={10}
       >
         <Box onClick={handleBuyPremium} cursor="pointer">
           <Crown size={24} color="#ffd700" />
         </Box>
-        <Heading fontSize="2xl" color="var(--tg-theme-text-color)" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
+        <Heading fontSize="2xl" color="#000000" style={{letterSpacing: 0.1}} fontFamily={"Open Sans Regular, Erewhon Regular"}>Баланс жизни</Heading>
         <Box onClick={handleOpenReminders} cursor="pointer">
           <Bell size={24} color="var(--tg-theme-hint-color)" />
         </Box>
@@ -134,7 +134,7 @@ export const Layout: FC<LayoutProps> = ({ children, userId }) => {
       </Tabbar>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg="var(--tg-theme-bg-color)" color="var(--tg-theme-text-color)" maxWidth="90%">
+        <ModalContent bg="#FFFFFF" color="#000000" maxWidth="90%">
           <ModalHeader>Полная версия</ModalHeader>
           <ModalBody>
             <Text>

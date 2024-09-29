@@ -84,7 +84,7 @@ export const RemindersPage: React.FC = () => {
       await setReminder(userId, frequency, time, timezone.value);
       toast({
         title: 'Напоминание установлено',
-        description: `Вы будете получать уведомления каждые ${frequency} ${frequency === 1 ? 'день' : 'дня'} в ${time} (${timezone.label})`,
+        description: `Вы будете получать уведомления каждые ${frequency} ${frequency === 1 ? 'день' : 'дн.'} в ${time} (${timezone.label})`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -125,7 +125,7 @@ export const RemindersPage: React.FC = () => {
             transition={{ duration: 0.3 }}
           >
             <Card borderRadius="xl" bg="#FFFFFF" boxShadow="lg">
-              <CardHeader bg="#999999" borderTopRadius="xl">
+              <CardHeader bg="#FFFFFF" borderTopRadius="xl">
                 <Heading size="lg" fontFamily="Open Sans Regular" color="#">
                   Настройка напоминаний
                 </Heading>
@@ -137,13 +137,13 @@ export const RemindersPage: React.FC = () => {
                   </Flex>
                 ) : (
                   <VStack spacing={6} align="stretch">
-                    <Box bg='#999999' p={4} borderRadius="md">
+                    <Box bg='#EEEEEE' p={4} borderRadius="md">
                       <Text color="#000000" fontWeight="bold">
                         Текущий период:
                       </Text>
                       <Text color="#000000">
                         {currentReminder 
-                          ? `каждые ${currentReminder.frequency} ${currentReminder.frequency === 1 ? 'день' : 'дня'} в ${currentReminder.time}`
+                          ? `каждые ${currentReminder.frequency} ${currentReminder.frequency === 1 ? 'день' : 'дн.'} в ${currentReminder.time}`
                           : 'не установлено'}
                       </Text>
                     </Box>
@@ -157,7 +157,7 @@ export const RemindersPage: React.FC = () => {
                         styles={{
                           control: (provided) => ({
                             ...provided,
-                            backgroundColor: '#999999',
+                            backgroundColor: '#FFFFFF',
                             borderColor: 'var(--tg-theme-button-color)',
                             color: '#000000',
                           }),
@@ -167,7 +167,7 @@ export const RemindersPage: React.FC = () => {
                           }),
                           menu: (provided) => ({
                             ...provided,
-                            backgroundColor: '#999999',
+                            backgroundColor: '#FFFFFF',
                           }),
                           option: (provided, state) => ({
                             ...provided,
@@ -175,7 +175,7 @@ export const RemindersPage: React.FC = () => {
                               ? 'var(--tg-theme-button-color)'
                               : state.isFocused
                               ? 'var(--tg-theme-button-hover-color)'
-                              : '#999999',
+                              : '#FFFFFF',
                             color: '#000000',
                           }),
                           menuList: (provided) => ({
