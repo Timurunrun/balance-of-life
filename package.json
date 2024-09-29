@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "/",
+  "homepage": "https://3529143-wj25286.twc1.net/",
   "proxy": "http://localhost:5000/",
   "scripts": {
     "deploy": "gh-pages -d dist",

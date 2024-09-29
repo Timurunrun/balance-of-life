@@ -124,9 +124,9 @@ export const RemindersPage: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <Card borderRadius="xl" bg="var(--tg-theme-bg-color)" boxShadow="lg">
-              <CardHeader bg="var(--tg-theme-secondary-bg-color)" borderTopRadius="xl">
-                <Heading size="lg" fontFamily="Open Sans Regular" color="var(--tg-theme-text-color)">
+            <Card borderRadius="xl" bg="#FFFFFF" boxShadow="lg">
+              <CardHeader bg="#999999" borderTopRadius="xl">
+                <Heading size="lg" fontFamily="Open Sans Regular" color="#">
                   Настройка напоминаний
                 </Heading>
               </CardHeader>
@@ -137,18 +137,18 @@ export const RemindersPage: React.FC = () => {
                   </Flex>
                 ) : (
                   <VStack spacing={6} align="stretch">
-                    <Box bg="var(--tg-theme-secondary-bg-color)" p={4} borderRadius="md">
-                      <Text color="var(--tg-theme-text-color)" fontWeight="bold">
+                    <Box bg='#999999' p={4} borderRadius="md">
+                      <Text color="#000000" fontWeight="bold">
                         Текущий период:
                       </Text>
-                      <Text color="var(--tg-theme-text-color)">
+                      <Text color="#000000">
                         {currentReminder 
                           ? `каждые ${currentReminder.frequency} ${currentReminder.frequency === 1 ? 'день' : 'дня'} в ${currentReminder.time}`
                           : 'не установлено'}
                       </Text>
                     </Box>
                     <Box>
-                      <Text mb={2} color="var(--tg-theme-text-color)" fontWeight="bold">Часовой пояс</Text>
+                      <Text mb={2} color="#000000" fontWeight="bold">Часовой пояс</Text>
                       <Select
                         options={timezones}
                         value={timezone}
@@ -157,17 +157,17 @@ export const RemindersPage: React.FC = () => {
                         styles={{
                           control: (provided) => ({
                             ...provided,
-                            backgroundColor: 'var(--tg-theme-secondary-bg-color)',
+                            backgroundColor: '#999999',
                             borderColor: 'var(--tg-theme-button-color)',
-                            color: 'var(--tg-theme-text-color)',
+                            color: '#000000',
                           }),
                           singleValue: (provided) => ({
                             ...provided,
-                            color: 'var(--tg-theme-text-color)',
+                            color: '#000000',
                           }),
                           menu: (provided) => ({
                             ...provided,
-                            backgroundColor: 'var(--tg-theme-secondary-bg-color)',
+                            backgroundColor: '#999999',
                           }),
                           option: (provided, state) => ({
                             ...provided,
@@ -175,8 +175,8 @@ export const RemindersPage: React.FC = () => {
                               ? 'var(--tg-theme-button-color)'
                               : state.isFocused
                               ? 'var(--tg-theme-button-hover-color)'
-                              : 'var(--tg-theme-secondary-bg-color)',
-                            color: 'var(--tg-theme-text-color)',
+                              : '#999999',
+                            color: '#000000',
                           }),
                           menuList: (provided) => ({
                             ...provided,
@@ -189,13 +189,13 @@ export const RemindersPage: React.FC = () => {
                       />
                     </Box>
                     <Box>
-                      <Text mb={2} color="var(--tg-theme-text-color)" fontWeight="bold">Частота (в днях)</Text>
+                      <Text mb={2} color='#000000' fontWeight="bold">Частота (в днях)</Text>
                       <NumberInput 
                         min={1} 
                         max={7} 
                         value={frequency} 
                         onChange={(_, value) => setFrequency(value)}
-                        textColor="var(--tg-theme-text-color)"
+                        textColor='#000000'
                         borderColor="var(--tg-theme-button-color)"
                       >
                         <NumberInputField />
@@ -206,19 +206,19 @@ export const RemindersPage: React.FC = () => {
                       </NumberInput>
                     </Box>
                     <Box>
-                      <Text mb={2} color="var(--tg-theme-text-color)" fontWeight="bold">Время</Text>
+                      <Text mb={2} color='#000000' fontWeight="bold">Время</Text>
                       <Input
                         type="time"
                         value={time}
                         onChange={(e) => setTime(e.target.value)}
-                        textColor="var(--tg-theme-text-color)"
+                        textColor='#000000'
                         borderColor="var(--tg-theme-button-color)"
                       />
                     </Box>
                     <Button 
                       onClick={handleSetReminder} 
                       bg="var(--tg-theme-button-color)" 
-                      color="var(--tg-theme-button-text-color)"
+                      color='#000000'
                       _hover={{ opacity: 0.8 }}
                       size="lg"
                     >

@@ -185,7 +185,7 @@ export const GoalsPage: FC = () => {
   return (
     <Layout userId={userId}>
       <Box 
-        bg="var(--tg-theme-bg-color)" 
+        bg="#FFFFFF" 
         borderRadius="xl" 
         pt={6}
         w="full" 
@@ -219,7 +219,7 @@ export const GoalsPage: FC = () => {
                     borderColor='var(--tg-theme-section-separator-color)' 
                     className="w-full justify-between items-center border-b pb-2"
                   >
-                    <Text key={`text-${goal.goal_id}`} fontSize="lg" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">{index + 1}. {goal.goal_name}</Text>
+                    <Text key={`text-${goal.goal_id}`} fontSize="lg" fontFamily={"Open Sans Regular"} color="#000000">{index + 1}. {goal.goal_name}</Text>
                     <Box key={`box-${goal.goal_id}`}>
                       <IconButton
                         key={`edit-${goal.goal_id}`}
@@ -279,12 +279,12 @@ export const GoalsPage: FC = () => {
         }}
       >
         <AlertDialogOverlay>
-          <AlertDialogContent maxWidth="90%" bg="var(--tg-theme-bg-color)">
-            <AlertDialogHeader fontSize="lg" fontWeight="bold" color="var(--tg-theme-text-color)">
+          <AlertDialogContent maxWidth="90%" bg="#FFFFFF">
+            <AlertDialogHeader fontSize="lg" fontWeight="bold" color="#000000">
               {goalToDelete ? 'Подтвердите удаление' : editingGoal ? 'Изменить цель' : 'Добавить цель'}
             </AlertDialogHeader>
             <AlertDialogCloseButton />
-            <AlertDialogBody color="var(--tg-theme-text-color)">
+            <AlertDialogBody color="#000000">
               {goalToDelete ? (
                 <Text>Вы уверены, что хотите удалить цель «{goalToDelete.goal_name}»? Это приведет к очистке всех связанных с ней данных.</Text>
               ) : (
@@ -305,7 +305,7 @@ export const GoalsPage: FC = () => {
                   <Button colorScheme="red" onClick={handleConfirmDeleteGoal}>
                     Удалить
                   </Button>
-                  <Button variant="ghost" color="var(--tg-theme-text-color)" _hover={{ }} ref={cancelRef} onClick={() => {
+                  <Button variant="ghost" color="#000000" _hover={{ }} ref={cancelRef} onClick={() => {
                     setGoalToDelete(null);
                     onClose();
                   }}>
@@ -322,7 +322,7 @@ export const GoalsPage: FC = () => {
                   >
                     {editingGoal ? 'Обновить' : 'Добавить'}
                   </Button>
-                  <Button variant="ghost" color="var(--tg-theme-text-color)" _hover={{ }} ref={cancelRef} onClick={onClose}>Закрыть</Button>
+                  <Button variant="ghost" color="#000000" _hover={{ }} ref={cancelRef} onClick={onClose}>Закрыть</Button>
                 </>
               )}
             </AlertDialogFooter>

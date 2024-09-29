@@ -92,7 +92,7 @@ const CircularProgressChart = ({ value, max, label, color }: { value: number; ma
           {value}
         </text>
       </svg>
-      <Text fontSize="sm" mt={1} color="var(--tg-theme-text-color)">{label}</Text>
+      <Text fontSize="sm" mt={1} color="#000000">{label}</Text>
     </Box>
   );
 };
@@ -164,7 +164,7 @@ export const StatisticsPage: React.FC = () => {
         overflow="hidden"
       >
         <VStack spacing={6} align="stretch" px={4} pb="40px" fontFamily={"Open Sans Regular"}>
-          <Box bg="var(--tg-theme-bg-color)" borderRadius="xl" p={4} boxShadow="md">
+          <Box bg="#FFFFFF" borderRadius="xl" p={4} boxShadow="md">
             <Text as="h2" size="md" mb={2} fontFamily={"Open Sans Regular"}>
               Выберите временной промежуток
             </Text>
@@ -189,9 +189,9 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
+                  <Card borderRadius="xl" bg="#FFFFFF">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="#000000">
                         Ваш баланс жизни за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}
                       </Heading>
                     </CardHeader>
@@ -217,21 +217,21 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
+                  <Card borderRadius="xl" bg="#FFFFFF">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Сводка на {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="#000000">Сводка на {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
                       <SimpleGrid columns={1} spacing={4}>
                         <Box>
-                          <Text fontWeight="medium" color="var(--tg-theme-text-color)">Средняя оценка</Text>
-                          <Text fontSize="2xl" fontWeight="bold" color="var(--tg-theme-text-color)">
+                          <Text fontWeight="medium" color="#000000">Средняя оценка</Text>
+                          <Text fontSize="2xl" fontWeight="bold" color="#000000">
                             {averageRating}
                           </Text>
                         </Box>
                         {highestRated && (
                           <Box>
-                            <Text fontWeight="medium" color="var(--tg-theme-text-color)">Лучшая цель</Text>
+                            <Text fontWeight="medium" color="#000000">Лучшая цель</Text>
                             <Badge variant="subtle" colorScheme="green" mt={1}>
                               {highestRated.aspect} ({highestRated.rating})
                             </Badge>
@@ -239,7 +239,7 @@ export const StatisticsPage: React.FC = () => {
                         )}
                         {lowestRated && (
                           <Box>
-                            <Text fontWeight="medium" color="var(--tg-theme-text-color)">Стоит поработать</Text>
+                            <Text fontWeight="medium" color="#000000">Стоит поработать</Text>
                             <Badge variant="subtle" colorScheme="red" mt={1}>
                               {lowestRated.aspect} ({lowestRated.rating})
                             </Badge>
@@ -256,16 +256,16 @@ export const StatisticsPage: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: 0.2 }}
                 >
-                  <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
+                  <Card borderRadius="xl" bg="#FFFFFF">
                     <CardHeader>
-                      <Heading size="md" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)">Подробные данные за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
+                      <Heading size="md" fontFamily={"Open Sans Regular"} color="#000000">Подробные данные за {period === 'week' ? 'эту неделю' : period === 'month' ? 'этот месяц' : 'этот год'}</Heading>
                     </CardHeader>
                     <CardBody>
                       <List spacing={2}>
                         {data.map((item) => (
                           <ListItem key={item.aspect}>
                             <Flex justify="space-between" align="center">
-                              <Text color="var(--tg-theme-text-color)">{item.aspect}</Text>
+                              <Text color="#000000">{item.aspect}</Text>
                               <Badge variant="outline" colorScheme='green'>{item.rating}/5</Badge>
                             </Flex>
                           </ListItem>
@@ -277,9 +277,9 @@ export const StatisticsPage: React.FC = () => {
               ]}
             </AnimatePresence>
           ) : (
-            <Card borderRadius="xl" bg="var(--tg-theme-bg-color)">
+            <Card borderRadius="xl" bg="#FFFFFF">
               <CardBody>
-                <Text color="var(--tg-theme-text-color)">Нет данных для отображения за выбранный период.</Text>
+                <Text color="#000000">Нет данных для отображения за выбранный период.</Text>
               </CardBody>
             </Card>
           )}

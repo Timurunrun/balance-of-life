@@ -109,7 +109,7 @@ const CustomToggle: FC<{ onConfirm: () => void; isAnimating: boolean }> = ({ onC
       <Box
         w="40px"
         h="40px"
-        bg="var(--tg-theme-bg-color)"
+        bg="#FFFFFF"
         borderRadius="full"
         position="absolute"
         top="5px"
@@ -192,7 +192,7 @@ export const MainPage: FC = () => {
   return (
     <Layout userId={userId}>
       <Box 
-        bg="var(--tg-theme-bg-color)" 
+        bg="#FFFFFF" 
         borderRadius="xl" 
         pt={6}
         px={6}
@@ -209,7 +209,7 @@ export const MainPage: FC = () => {
           <Box w="full">
             {goals.map((goal) => (
               <Box key={goal.goal_id} mb={8}>
-                <Text fontSize="lg" fontFamily={"Open Sans Regular"} color="var(--tg-theme-text-color)" mb={2}>{goal.goal_order}. {goal.goal_name}</Text>
+                <Text fontSize="lg" fontFamily={"Open Sans Regular"} color="#000000" mb={2}>{goal.goal_order}. {goal.goal_name}</Text>
                 <Slider
                   value={sliderValues[goal.goal_id]}
                   onChange={(value) => handleSliderChange(goal.goal_id, value)}
@@ -226,7 +226,7 @@ export const MainPage: FC = () => {
                       mt={3}
                       ml={-1}
                       fontSize="sm"
-                      color="var(--tg-theme-hint-color)"
+                      color="#999999"
                     >
                       {value}
                     </SliderMark>
